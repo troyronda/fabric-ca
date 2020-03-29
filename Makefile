@@ -68,7 +68,7 @@ export GO_LDFLAGS
 IMAGES = $(PROJECT_NAME)
 FVTIMAGE = $(PROJECT_NAME)-fvt
 
-RELEASE_PLATFORMS = linux-amd64 darwin-amd64 linux-ppc64le linux-s390x windows-amd64
+RELEASE_PLATFORMS = linux-amd64 darwin-amd64 linux-arm64
 RELEASE_PKGS = fabric-ca-client fabric-ca-server
 
 TOOLS = build/tools
@@ -122,7 +122,7 @@ fabric-ca-server: bin/fabric-ca-server
 
 bin/%: $(GO_SOURCE)
 	@echo "Building ${@F} in bin directory ..."
-	@mkdir -p bin && go build -o bin/${@F} -tags "pkcs11" -ldflags "$(GO_LDFLAGS)" $(PKGNAME)/$(path-map.${@F})
+	@mkdir -p bin && go build -o bin/${@F} -tags "pkcs11" -ldflags "$(GO_LDFLAGS) -s -w -linkmode external -extldflags '-static'" $(PKGNAME)/$(path-map.${@F})
 	@echo "Built bin/${@F}"
 
 build/image/fabric-ca/$(DUMMY):
@@ -134,11 +134,7 @@ build/image/fabric-ca/$(DUMMY):
 		--build-arg GO_TAGS=pkcs11 \
 		--build-arg GO_LDFLAGS="${DOCKER_GO_LDFLAGS}" \
 		--build-arg ALPINE_VER=${ALPINE_VER} \
-		-t $(BASE_DOCKER_NS)/$(TARGET) .
-	docker tag $(BASE_DOCKER_NS)/$(TARGET) \
-		$(DOCKER_NS)/$(TARGET):$(BASE_VERSION)
-	docker tag $(BASE_DOCKER_NS)/$(TARGET) \
-		$(DOCKER_NS)/$(TARGET):$(DOCKER_TAG)
+		-t $(BASE_DOCKER_NS)/$(TARGET):$(DOCKER_TAG) .
 	@touch $@
 
 build/image/fabric-ca-fvt/$(DUMMY):

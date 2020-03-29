@@ -45,14 +45,14 @@ DRUN = docker run -i --rm $(DOCKER_RUN_FLAGS) \
 	-v $(abspath .):/opt/gopath/src/$(PKGNAME) \
 	-w /opt/gopath/src/$(PKGNAME)
 
-DBUILD = docker build $(DOCKER_BUILD_FLAGS)
+DBUILD = docker buildx build $(DOCKER_BUILD_FLAGS) --platform=linux/arm64,linux/amd64 --push
 
-BASE_DOCKER_NS ?= hyperledger
-BASE_DOCKER_TAG=$(ARCH)-$(BASEIMAGE_RELEASE)
+BASE_DOCKER_NS ?= troyronda
+BASE_DOCKER_TAG=$(BASEIMAGE_RELEASE)
 
-DOCKER_NS ?= hyperledger
+DOCKER_NS ?= troyronda
 NEXUS_URL ?= nexus3.hyperledger.org:10001/hyperledger
-DOCKER_TAG=$(ARCH)-$(PROJECT_VERSION)
+DOCKER_TAG=$(PROJECT_VERSION)
 
 DOCKER_GO_LDFLAGS += $(GO_LDFLAGS)
 DOCKER_GO_LDFLAGS += -linkmode external -extldflags '-lpthread'
